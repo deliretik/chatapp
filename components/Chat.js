@@ -6,6 +6,18 @@ import { GiftedChat, Bubble, Day, SystemMessage} from 'react-native-gifted-chat'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 //import NetInfo internet connection status
 import NetInfo from '@react-native-community/netinfo';
+
+import CustomActions from './CustomActions';
+import MapView from 'react-native-maps';
+
+import { LogBox } from 'react-native';
+
+//ignore warnings
+LogBox.ignoreLogs([
+  'Setting a timer', 
+  'Animated.event now requires a second argument for options',
+  'AsyncStorage has been extracted from react-native core']);
+
 //importing firestore using firebase
 const firebase = require('firebase');
 require('firebase/firestore');
@@ -22,7 +34,9 @@ export default class Chat extends React.Component {
         name: "",
         avatar: "",
       },
-      isConnected: false
+      isConnected: false,
+      image: null,
+      location: null,
     }
 
     const firebaseConfig = {
@@ -55,6 +69,7 @@ export default class Chat extends React.Component {
     }
   };
 
+  //save messages to AsyncStorage
   async saveMessages() {
     try {
       await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages));
@@ -63,6 +78,7 @@ export default class Chat extends React.Component {
     }
   };
 
+  //delete messages from AsyncStorage
   async deleteMessages() {
     try {
       await AsyncStorage.removeItem('messages');
@@ -116,9 +132,10 @@ with static message so you see each element of the UI displayed on screen with s
             .where("uid", "==", this.state.uid);
 
         });
+        //saves msgs online
         this.saveMessages();
         } else {
-          // if user offline
+          // if offline
           this.setState({ isConnected: false });
           console.log('offline');
           this.getMessages();
@@ -140,7 +157,9 @@ with static message so you see each element of the UI displayed on screen with s
           _id: data.user._id,
           name: data.user.name,
           avatar: data.user.avatar
-        }
+        },
+        image: data.image || null,
+        location: data.location || null,
       });
     });
     this.setState({
@@ -157,9 +176,11 @@ with static message so you see each element of the UI displayed on screen with s
     this.referenceChatMessages.add({
       uid: this.state.uid,
       _id: message._id,
-      text: message.text,
+      text: message.text || "",
       createdAt: message.createdAt,
-      user: this.state.user
+      user: this.state.user,
+      image: message.image || "",
+      location: message.location || null,
     });
   }
 
@@ -174,12 +195,12 @@ with static message so you see each element of the UI displayed on screen with s
   }
 
   //dont receive updates from collection
-  componentWillUnmount() {
-    if (this.state.isConnected) {
-      this.authUnsubscribe();
-      this.unsubscribe();
-    }
-  }
+  // componentWillUnmount() {
+  //   if (this.state.isConnected) {
+  //     this.authUnsubscribe();
+  //     this.unsubscribe();
+  //   }
+  // }
 
   //renderBubble function defines style of user messages
   renderBubble(props) {
@@ -227,6 +248,33 @@ with static message so you see each element of the UI displayed on screen with s
     }
   }
 
+  //to access CustomActions
+  renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
+
+  //return a MapView when surrentMessage contains location data
+  renderCustomView (props) {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+        return (
+            <MapView
+                style={{width: 150,
+                height: 100,
+                borderRadius: 13,
+                margin: 3}}
+                region={{
+                latitude: currentMessage.location.latitude,
+                longitude: currentMessage.location.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+                }}
+            />
+        );
+    }
+    return null;
+  }
+
   render() {
 
     // color picked in Start screen gets applied for chat screen
@@ -245,6 +293,8 @@ with static message so you see each element of the UI displayed on screen with s
             renderDay={this.renderDay.bind(this)}
             renderSystemMessage={this.renderSystemMessage.bind(this)}
             renderInputToolbar={this.renderInputToolbar.bind(this)}
+            renderActions={this.renderCustomActions}
+            renderCustomView={this.renderCustomView}
             user={{
               _id: this.state.user._id,
               name: this.state.name,

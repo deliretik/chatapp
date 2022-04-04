@@ -4,6 +4,8 @@ import { StyleSheet, View, Text, TextInput, Pressable, ImageBackground, Image, T
 
 //importing the default background image from the assets folder
 import BackgroundImage from "../assets/BackgroundImage.png"
+import icon from '../assets/usericon.png';
+
 
 export default class Start extends React.Component {
     constructor(props) {
@@ -42,7 +44,7 @@ export default class Start extends React.Component {
 
           <View style={styles.box1}>
             <View style={styles.inputBox}>
-              
+            <Image source={icon} style={styles.image} />
               <TextInput
                 style={styles.input}
                 onChangeText={(text) => this.setState({ name: text})}
@@ -106,7 +108,7 @@ export default class Start extends React.Component {
           </View>
 
         </ImageBackground>
-
+        { Platform.OS === 'ios' ? <KeyboardAvoidingView behavior="padding" /> : null }
       </View>
     )
   }
