@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, Platform, KeyboardAvoidingView } from 'react-native';
-
 import { GiftedChat, Bubble, Day, SystemMessage} from 'react-native-gifted-chat';
 
 
