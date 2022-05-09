@@ -57,24 +57,44 @@ export default class Start extends React.Component {
 
             <View style={styles.colorArray}>
               <TouchableOpacity 
+                accessible={true}
+                accessibilityLabel="Background color change"
+                accessibilityHint="Lets you choose a darker background color for the Chat Screen"
+                accessibilityRole="button"
                 style={styles.color1} 
                 onPress={() => this.changeBgColor(this.colors.dark)}>
               </TouchableOpacity>
               <TouchableOpacity 
+                accessible={true}
+                accessibilityLabel="Background color change"
+                accessibilityHint="Lets you choose purple background color for the Chat Screen"
+                accessibilityRole="button"
                 style={styles.color2}
                 onPress={() => this.changeBgColor(this.colors.purple)}>
               </TouchableOpacity>
               <TouchableOpacity 
+                accessible={true}
+                accessibilityLabel="Background color change"
+                accessibilityHint="Lets you choose blue background color for the Chat Screen"
+                accessibilityRole="button"
                 style={styles.color3}
                 onPress={() => this.changeBgColor(this.colors.blue)}>
               </TouchableOpacity>
               <TouchableOpacity 
+                accessible={true}
+                accessibilityLabel="Background color change"
+                accessibilityHint="Lets you choose green background color for the Chat Screen"
+                accessibilityRole="button"
                 style={styles.color4}
                 onPress={() => this.changeBgColor(this.colors.green)}>
               </TouchableOpacity>     
             </View>
 
             <Pressable
+              accessible={true}
+              accessibilityLabel="Start chat"
+              accessibilityHint="Lets you navigate to the Chat Screen"
+              accessibilityRole="button"
               style={styles.button}
               onPress={() => this.props.navigation.navigate('Chat', { 
                 name: this.state.name,
@@ -98,7 +118,6 @@ const styles = StyleSheet.create({
   },
 
   backgroundImage: {
-    flex: 1,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
@@ -108,7 +127,7 @@ const styles = StyleSheet.create({
     height: '50%',
     width: '88%',
     alignItems: 'center',
-    paddingTop: 100
+    paddingTop: 100,
   },
 
   title: {
@@ -123,15 +142,15 @@ const styles = StyleSheet.create({
     width: '88%',
     justifyContent: 'space-around', 
     alignItems: 'center',
-
+    borderRadius: 1
   },
 
   inputBox: {
     borderWidth: 2,
-    borderRadius: 1,
+    borderRadius: 3,
     borderColor: 'grey',
     width: '88%',
-    height: 60,
+    height: 65,
     paddingLeft: 20,
     flexDirection: 'row',
     alignItems: 'center'
@@ -144,7 +163,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    fontSize: 16, 
+    fontSize: 18, 
     fontWeight: "300", 
     color: '#757083', 
     opacity: 0.5,
@@ -153,11 +172,12 @@ const styles = StyleSheet.create({
   colorBox: {
     marginRight: 'auto',
     paddingLeft: 15,
-    width: '88%'
+    width: '88%',
+    top: 15
   },
 
   chooseColor: {
-    fontSize: 16, 
+    fontSize: 18, 
     fontWeight: "300", 
     color: '#757083', 
     opacity: 1,
@@ -203,7 +223,8 @@ const styles = StyleSheet.create({
     height: 70,
     backgroundColor: '#757083',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    borderRadius: 2
   },
 
   buttonText: {
