@@ -22,12 +22,12 @@ export default class Chat extends React.Component {
     }
 
     const firebaseConfig = {
-      apiKey: "AIzaSyCYMEflOC1GMcXNeIn-eFp_uvPbTN3FJ9A",
-      authDomain: "chatapp-c28e2.firebaseapp.com",
-      projectId: "chatapp-c28e2",
-      storageBucket: "chatapp-c28e2.appspot.com",
-      messagingSenderId: "476600146165"
-    }
+       apiKey: "AIzaSyDkNj4uERxt8xXGCLndzv23gFO2SLkSpsw",
+       authDomain: "chatapp2-fba75.firebaseapp.com",
+       projectId: "chatapp2-fba75",
+       storageBucket: "chatapp2-fba75.appspot.com",
+       messagingSenderId: "323106331044"
+      };
 
     //initialize app 
     if (!firebase.apps.length){
