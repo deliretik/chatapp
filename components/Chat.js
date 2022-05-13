@@ -126,6 +126,7 @@ with static message so you see each element of the UI displayed on screen with s
 
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
+    
     // go through each document
     querySnapshot.forEach((doc) => {
       // get the QueryDocumentSnapshot's data
@@ -171,8 +172,6 @@ with static message so you see each element of the UI displayed on screen with s
     });
   }
 
-
-
     //dont receive updates from collection
     componentWillUnmount() {
       if (this.state.isConnected) {
@@ -193,7 +192,6 @@ with static message so you see each element of the UI displayed on screen with s
       />
     )
   };
-
 
   //renderDay function renders a message showing the date of the chat; the text color depends on the set background color
   renderDay(props) {
