@@ -1,13 +1,34 @@
 import React from 'react';
 import { View, Platform, KeyboardAvoidingView } from 'react-native';
 import { GiftedChat, Bubble, Day, SystemMessage, InputToolbar} from 'react-native-gifted-chat';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 
+import CustomActions from './CustomActions';
+import MapView from 'react-native-maps';
+
+import { LogBox } from 'react-native';
+
+//ignore warnings
+LogBox.ignoreLogs([
+  'Setting a timer', 
+  'Animated.event now requires a second argument for options',
+  'AsyncStorage has been extracted from react-native core']);
 
 //importing firestore
 const firebase = require('firebase');
 require('firebase/firestore');
+
+const firebaseConfig = {
+   apiKey: "AIzaSyDkNj4uERxt8xXGCLndzv23gFO2SLkSpsw",
+   authDomain: "chatapp2-fba75.firebaseapp.com",
+   projectId: "chatapp2-fba75",
+   storageBucket: "chatapp2-fba75.appspot.com",
+   messagingSenderId: "323106331044",
+   appId: "1:323106331044:web:5e1409cf56a0b0bdc7c931",
+   measurementId: "G-8D9R6977J3"
+  }
 
 export default class Chat extends React.Component {
 
@@ -21,16 +42,10 @@ export default class Chat extends React.Component {
         name: "",
         avatar: "",
       },
-      isConnected: false
+      isConnected: false,
+      image: null,
+      location: null,
     }
-
-    const firebaseConfig = {
-       apiKey: "AIzaSyDkNj4uERxt8xXGCLndzv23gFO2SLkSpsw",
-       authDomain: "chatapp2-fba75.firebaseapp.com",
-       projectId: "chatapp2-fba75",
-       storageBucket: "chatapp2-fba75.appspot.com",
-       messagingSenderId: "323106331044"
-      };
 
     //initialize app 
     if (!firebase.apps.length){
@@ -40,6 +55,7 @@ export default class Chat extends React.Component {
     this.referenceChatMessages = firebase.firestore().collection('messages');
   }
 
+  //get messages from asyncStorage
   async getMessages() {
     let messages = '';
     try {
@@ -52,6 +68,7 @@ export default class Chat extends React.Component {
     }
   };
 
+  //save msgs to asyncStorage
   async saveMessages() {
     try {
       await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages));
@@ -60,6 +77,7 @@ export default class Chat extends React.Component {
     }
   };
 
+  //delete msgs from asyncStorage
   async deleteMessages() {
     try {
       await AsyncStorage.removeItem('messages');
@@ -90,31 +108,31 @@ with static message so you see each element of the UI displayed on screen with s
           .orderBy('createdAt', 'desc')
           .onSnapshot(this.onCollectionUpdate);
 
+          //authentication
+          this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+            if (!user) {
+              await firebase.auth().signInAnonymously();
+            }
 
-    //authentication
-    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-      if (!user) {
-        await firebase.auth().signInAnonymously();
-      }
+          //update user state with currently active user data
+          this.setState({
+            uid: user.uid,
+            messages: [],
+            user: {
+              _id: user.uid,
+              name: name,
+              avatar: "https://placeimg.com/140/140/any"
+            },
+          });
 
-      //update user state with currently active user data
-      this.setState({
-        uid: user.uid,
-        messages: [],
-        user: {
-          _id: user.uid,
-          name: name,
-          avatar: "https://placeimg.com/140/140/any"
-        }
-      });
-
-      this.refMsgsUser = firebase
+          this.refMsgsUser = firebase
             .firestore()
             .collection("messages")
             .where("uid", "==", this.state.uid);
-
         });
+        //save msgs when online
         this.saveMessages();
+
         } else {
           // if user offline
           this.setState({ isConnected: false });
@@ -126,7 +144,6 @@ with static message so you see each element of the UI displayed on screen with s
 
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
-    
     // go through each document
     querySnapshot.forEach((doc) => {
       // get the QueryDocumentSnapshot's data
@@ -139,7 +156,9 @@ with static message so you see each element of the UI displayed on screen with s
           _id: data.user._id,
           name: data.user.name,
           avatar: data.user.avatar
-        }
+        },
+        image: data.image || null,
+        location: data.location || null,
       });
     });
     this.setState({
@@ -149,6 +168,12 @@ with static message so you see each element of the UI displayed on screen with s
     this.saveMessages()
   };
 
+  //dont receive updates from collection
+  componentWillUnmount() {
+      this.authUnsubscribe();
+      this.unsubscribe();
+  }
+
   //adding new message to database collection
   addMessage() {
     const message = this.state.messages[0];
@@ -156,9 +181,11 @@ with static message so you see each element of the UI displayed on screen with s
     this.referenceChatMessages.add({
       uid: this.state.uid,
       _id: message._id,
-      text: message.text,
+      text: message.text || "",
       createdAt: message.createdAt,
-      user: this.state.user
+      user: this.state.user,
+      image: message.image || "",
+      location: message.location || null,
     });
   }
 
@@ -172,14 +199,6 @@ with static message so you see each element of the UI displayed on screen with s
     });
   }
 
-    //dont receive updates from collection
-    componentWillUnmount() {
-      if (this.state.isConnected) {
-        this.authUnsubscribe();
-        this.unsubscribe();
-      }
-    }
-
   //renderBubble function defines style of user messages
   renderBubble(props) {
     return (
@@ -192,6 +211,7 @@ with static message so you see each element of the UI displayed on screen with s
       />
     )
   };
+
 
   //renderDay function renders a message showing the date of the chat; the text color depends on the set background color
   renderDay(props) {
@@ -220,10 +240,37 @@ with static message so you see each element of the UI displayed on screen with s
     } else {
       return(
         <InputToolbar
-        {...props}
+          {...props}
         />
       );
     }
+  }
+
+   //to access CustomActions
+  renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
+
+  //return a MapView when surrentMessage contains location data
+  renderCustomView (props) {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+        return (
+            <MapView
+                style={{width: 150,
+                height: 100,
+                borderRadius: 13,
+                margin: 3}}
+                region={{
+                latitude: currentMessage.location.latitude,
+                longitude: currentMessage.location.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+                }}
+            />
+        );
+    }
+    return null;
   }
 
   render() {
@@ -239,11 +286,13 @@ with static message so you see each element of the UI displayed on screen with s
         }}>
           <GiftedChat 
             messages={this.state.messages}
-            onSend={(messages) => this.onSend(messages)}
+            onSend={messages => this.onSend(messages)}
             renderBubble={this.renderBubble.bind(this)}
             renderDay={this.renderDay.bind(this)}
             renderSystemMessage={this.renderSystemMessage.bind(this)}
             renderInputToolbar={this.renderInputToolbar.bind(this)}
+            renderActions={this.renderCustomActions}
+            renderCustomView={this.renderCustomView}
             user={{
               _id: this.state.user._id,
               name: this.state.name,
@@ -256,4 +305,3 @@ with static message so you see each element of the UI displayed on screen with s
     )
   }
 }
-      
