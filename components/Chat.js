@@ -21,13 +21,13 @@ const firebase = require('firebase');
 require('firebase/firestore');
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAGbZEn1atcuSdgxelkIyQk11IkT_GITL8",
-  authDomain: "meet-app-3.firebaseapp.com",
-  projectId: "meet-app-3",
-  storageBucket: "meet-app-3.appspot.com",
-  messagingSenderId: "152012581348",
-  appId: "1:152012581348:web:ac22352b83ad89cc5cbff1",
-  measurementId: "G-3SYZ4567VY"
+  apiKey: "AIzaSyAGd_9-KIXxyhoSj9FAK9QMkppPXAHyf1o",
+  authDomain: "chat-app3-a0345.firebaseapp.com",
+  projectId: "chat-app3-a0345",
+  storageBucket: "chat-app3-a0345.appspot.com",
+  messagingSenderId: "106814569686",
+  appId: "1:106814569686:web:ea75578f3c2fff55619d77",
+  measurementId: "G-Z8R5YMZMYL"
 }
 
 export default class Chat extends React.Component {
