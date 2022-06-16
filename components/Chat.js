@@ -28,7 +28,7 @@ const firebaseConfig = {
   messagingSenderId: "152012581348",
   appId: "1:152012581348:web:ac22352b83ad89cc5cbff1",
   measurementId: "G-3SYZ4567VY"
-};
+}
 
 export default class Chat extends React.Component {
 
@@ -158,7 +158,7 @@ with static message so you see each element of the UI displayed on screen with s
           avatar: data.user.avatar
         },
         image: data.image || null,
-        location: data.location || null,
+        location: data.location || null,
       });
     });
     this.setState({
@@ -185,7 +185,7 @@ with static message so you see each element of the UI displayed on screen with s
       createdAt: message.createdAt,
       user: this.state.user,
       image: message.image || "",
-      location: message.location || null,
+      location: message.location || null,
     });
   }
 
